@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>icons/download.png</file>
+        <file>icons/energy.png</file>
+        <file>icons/euro.png</file>
+        <file>icons/exit.png</file>
+        <file>icons/open.png</file>
+        <file>icons/price.png</file>
+        <file>icons/review.png</file>
+    </qresource>
+    <qresource prefix="/sql">
+        <file>db.sql</file>
+    </qresource>
+</RCC>
