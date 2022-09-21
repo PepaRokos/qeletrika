@@ -3,7 +3,11 @@
 //
 
 #include "ReviewLoader.h"
+#ifdef Q_OS_WIN
+#include <OpenXLSX.hpp>
+#else
 #include <OpenXLSX/OpenXLSX.hpp>
+#endif
 #include <QString>
 #include <QStringList>
 #include <QCalendar>

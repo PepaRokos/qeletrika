@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSqlField>
+#include <QDir>
 #include "DataProvider.h"
 
 DataProvider::DataProvider() {
@@ -14,7 +15,14 @@ DataProvider::DataProvider() {
 }
 
 bool DataProvider::openDb() {
-    m_database.setDatabaseName("data.db");
+    QString strAppPath = QDir::homePath() + "/.qeletrika";
+    QDir appHome(strAppPath);
+
+    if (!appHome.exists()) {
+        QDir::home().mkdir(".qeletrika");
+    }
+
+    m_database.setDatabaseName(strAppPath + "/data.db");
 
     if (!m_database.open()) {
         return false;

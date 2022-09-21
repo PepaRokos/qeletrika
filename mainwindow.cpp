@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget* parent) :
     connect(ui->comboPeriod, qOverload<int>(&QComboBox::currentIndexChanged), [this](int) {
         fillCourses();
         fillPrices();
+        fillReview();
     });
 
     m_coursesModel = new NumModel(this);
