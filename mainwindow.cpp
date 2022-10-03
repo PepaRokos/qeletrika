@@ -9,6 +9,7 @@
 #include "PricesDownloader.h"
 #include "ReviewLoader.h"
 #include "ItemDelegate.h"
+#include "settings.h"
 #include <QMessageBox>
 #include <QComboBox>
 #include <QFileDialog>
@@ -39,6 +40,8 @@ MainWindow::MainWindow(QWidget* parent) :
     ui->tableReview->setModel(m_reviewModel);
     m_provider.setReviewModel(m_reviewModel);
     ui->tableReview->setItemDelegate(new ItemDelegate(3, this));
+
+    m_provider.loadSettings();
 
     fillPeriods();
     fillReview();
@@ -158,4 +161,13 @@ void MainWindow::fillReview() {
 
 void MainWindow::on_checkDays_toggled(bool check) {
     fillReview();
+}
+
+void MainWindow::on_actionBuyingSettings_triggered() {
+    SettingsDialog settings(m_provider.settings());
+    settings.setModal(true);
+
+    if (settings.exec() == QDialog::Accepted) {
+        m_provider.saveSettings(settings.settings());
+    }
 }

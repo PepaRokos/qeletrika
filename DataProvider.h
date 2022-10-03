@@ -35,6 +35,10 @@ public:
     int periodId(int month, int year, int day);
     int newPeriod(int month, int year, int day);
 
+    void loadSettings();
+    void saveSettings(const Settings& settings);
+    const Settings& settings() const;
+
     bool openDb();
 
 private:
@@ -42,6 +46,7 @@ private:
     QSqlQueryModel* m_coursesModel;
     QSqlQueryModel* m_reviewModel;
     QSqlDatabase m_database;
+    Settings m_settings;
 };
 
 

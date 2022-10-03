@@ -8,6 +8,9 @@
 #include <QSqlRecord>
 #include <QSqlField>
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "DataProvider.h"
 
 DataProvider::DataProvider() {
@@ -15,6 +18,7 @@ DataProvider::DataProvider() {
 }
 
 bool DataProvider::openDb() {
+#ifdef NDEBUG
     QString strAppPath = QDir::homePath() + "/.qeletrika";
     QDir appHome(strAppPath);
 
@@ -23,7 +27,9 @@ bool DataProvider::openDb() {
     }
 
     m_database.setDatabaseName(strAppPath + "/data.db");
-
+#else
+    m_database.setDatabaseName("data.db");
+#endif
     if (!m_database.open()) {
         return false;
     }
@@ -254,3 +260,93 @@ QString DataProvider::totalEarn(const Period& period) {
         .arg(query.value("earn").toDouble(), 0, 'f', 2);
 }
 
+QString configPath() {
+    QString cfgPath;
+#ifdef NDEBUG
+    QString strAppPath = QDir::homePath() + "/.qeletrika";
+    QDir appHome(strAppPath);
+
+    if (!appHome.exists()) {
+        QDir::home().mkdir(".qeletrika");
+    }
+
+    cfgPath = strAppPath + "/config.json";
+#else
+    cfgPath = "config.json";
+#endif
+
+    return cfgPath;
+}
+
+void DataProvider::loadSettings() {
+    QFile fileConfig(configPath());
+
+    if (!fileConfig.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
+
+    auto document = QJsonDocument::fromJson(fileConfig.readAll());
+
+    QList<LowTariffTimePtr> lowTariff;
+    for (const auto& tariff : document["lowTariff"].toArray()) {
+        auto tariffObj = tariff.toObject();
+        lowTariff.append(LowTariffTimePtr::create(tariffObj["from"].toDouble(), tariffObj["to"].toDouble()));
+    }
+
+    QList<LowTariffTimePtr> lowTariffHoliday;
+    for (const auto& tariff : document["lowTariffHoliday"].toArray()) {
+        auto tariffObj = tariff.toObject();
+        lowTariffHoliday.append(LowTariffTimePtr::create(tariffObj["from"].toDouble(), tariffObj["to"].toDouble()));
+    }
+
+    m_settings = Settings(document["monthFee"].toDouble(),
+                          document["distributionFeeLow"].toDouble(),
+                          document["distributionFeeHigh"].toDouble(),
+                          document["fixPrice"].toBool(),
+                          document["lowPrice"].toDouble(),
+                          document["highPrice"].toDouble(),
+                          lowTariff, lowTariffHoliday);
+}
+
+const Settings& DataProvider::settings() const {
+    return m_settings;
+}
+
+void DataProvider::saveSettings(const Settings& settings) {
+    m_settings = settings;
+
+    QJsonObject obj;
+    obj["monthFee"] = m_settings.monthFee();
+    obj["distributionFeeLow"] = m_settings.distributionFeeLow();
+    obj["distributionFeeHigh"] = m_settings.distributionFeeHigh();
+    obj["fixPrice"] = m_settings.fixPrice();
+    obj["lowPrice"] = m_settings.lowPrice();
+    obj["highPrice"] = m_settings.highPrice();
+
+    QJsonArray arrayTariff;
+    for (const auto& lowTariff : m_settings.lowTariff()) {
+        QJsonObject objTariff;
+        objTariff["from"] = lowTariff->from();
+        objTariff["to"] = lowTariff->to();
+        arrayTariff.append(objTariff);
+    }
+
+    obj["lowTariff"] = arrayTariff;
+
+    QJsonArray arrayTariffHoliday;
+    for (const auto& lowTariff : m_settings.lowTariffHoliday()) {
+        QJsonObject objTariff;
+        objTariff["from"] = lowTariff->from();
+        objTariff["to"] = lowTariff->to();
+        arrayTariffHoliday.append(objTariff);
+    }
+
+    obj["lowTariffHoliday"] = arrayTariffHoliday;
+
+    QFile fileSettings(configPath());
+    if (!fileSettings.open(QIODevice::WriteOnly)) {
+        return;
+    }
+
+    fileSettings.write(QJsonDocument(obj).toJson());
+}

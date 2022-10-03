@@ -58,7 +58,13 @@ add_executable(qeletrika
         ReviewLoader.cpp
         ReviewLoader.h
         ItemDelegate.cpp
-        ItemDelegate.h)
+        ItemDelegate.h
+        settings.cpp
+        settings.h
+        settings.ui
+        itablemodel.h
+        itablemodel.cpp
+        autotablemodel.h)
 
 target_link_libraries(qeletrika
         Qt5::Core

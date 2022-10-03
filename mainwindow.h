@@ -27,6 +27,7 @@ private slots:
     void on_actionExit_triggered();
     void on_actionOpen_review_triggered();
     void on_actionDownload_prices_triggered();
+    void on_actionBuyingSettings_triggered();
     void on_checkDays_toggled(bool check);
     void on_coursesComplete(const Period& period, const QList<double>& courses);
     void on_pricesComplete(const Period& period, const QList<QList<double>>& prices);
