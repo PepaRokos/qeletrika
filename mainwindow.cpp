@@ -149,7 +149,7 @@ void MainWindow::disableActions() {
     m_dlPricesProg = true;
     ui->actionOpen_review->setEnabled(false);
     ui->actionDownload_prices->setEnabled(false);
-    ui->statusbar->showMessage("Download data in progress...");
+    ui->statusbar->showMessage("Downloading data in progress...");
 }
 
 void MainWindow::fillReview() {
