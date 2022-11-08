@@ -33,15 +33,26 @@ void CoursesDownloader::reqFinished(QNetworkReply* reply) {
     }
 
     if (m_days == m_daysDone) {
+        int listStartZeros = -1;
+
         for (int i = 0; i < m_courses.count(); i++) {
             if (m_courses[i] == 0 && i > 0) {
                 m_courses[i] = m_courses[i - 1];
-            } else if (i == 0 && m_courses[i] == 0) {
-                do {
-                    m_courses[i] = m_courses[i + 1];
-                } while (m_courses[i] == 0 || i + 1 < m_courses.count());
+            }
+
+            if (m_courses[i] == 0) {
+                ++listStartZeros;
+            } else if (listStartZeros > -1) {
+                for (int j = 0; j <= listStartZeros; j++) {
+                    m_courses[j] = m_courses[i];
+                }
             }
         }
+
+        for (int i = m_courses.count() - 1; i < 1; i--) {
+
+        }
+
         emit downloadComplete(m_period, m_courses);
     }
 }
