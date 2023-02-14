@@ -11,6 +11,7 @@
 #include <QString>
 #include <QStringList>
 #include <QCalendar>
+#include <clocale>
 #include "data.h"
 
 using namespace OpenXLSX;
@@ -55,7 +56,7 @@ ReviewLoader::Status ReviewLoader::loadFile(const QString& file) {
     m_review = Review({listDate[1].toInt(), listDate[2].toInt()});
     int numDays = QCalendar().daysInMonth(listDate[1].toInt(), listDate[2].toInt());
 
-    auto loc = std::setlocale(LC_NUMERIC, NULL);
+    auto loc = std::setlocale(LC_NUMERIC, nullptr);
     std::setlocale(LC_NUMERIC, "C");
 
     for (int i = 0; i < numDays * 24 * 4; i++) {

@@ -6,6 +6,18 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(CMAKE_MACOSX_RPATH TRUE)
+# use, i.e. don't skip the full RPATH for the build tree
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+# when building, don't use the install RPATH already
+# (but later on when installing)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 find_package(Qt5 COMPONENTS
         Core
@@ -33,13 +45,12 @@ include_directories(${GUMBO_QUERY_INCLUDE_DIR} ${GUMBO_INCLUDE_DIR})
 find_library(GUMBO_QUERY_LIB
         NAMES "gq"
         REQUIRED)
-link_directories(${GUMBO_QUERY_LIB})
+message(STATUS "gumbo query: ${GUMBO_QUERY_LIB}")
 
 find_library(GUMBO_LIB
         NAMES "gumbo"
         REQUIRED)
-link_directories(${GUMBO_LIB})
-
+message(STATUS "gumbo lib: ${GUMBO_LIB}")
 
 add_executable(qeletrika
         main.cpp
@@ -67,6 +78,6 @@ target_link_libraries(qeletrika
         Qt5::Sql
         Qt5::Network
         OpenXLSX::OpenXLSX
-        gq
-        gumbo
+        ${GUMBO_LIB}
+        ${GUMBO_QUERY_LIB}
         )
